@@ -1,5 +1,11 @@
 <template>
     <form @submit.prevent="sendFile" enctype="multipart/form-data">
+       
+        <div v-if="message"
+            :class="`message ${error ? 'is-danger' : 'is-success'}`"
+        >
+            <div class="message-body">{{message}}</div>
+        </div> 
 
         <div class="field">
 
@@ -43,12 +49,17 @@ export default {
   name: 'SimpleUpload',
   data() {
       return{
-          file: ""
+          file: "",
+          message: "",
+          error: false
       }
   },
   methods: {
       selectFile() {
           this.file = this.$refs.file.files[0];
+          this.error = false;
+          this.message = "";
+
       },
 
       async sendFile() {
@@ -57,8 +68,12 @@ export default {
           
           try {
             await axios.post('/upload', formData);
+            this.message = "File has been uploaded";
+            this.file = "";
+            this.error = false;
           } catch(err) {
-              console.log(err);
+              this.message = "Something went wrong";
+              this.error = true;
           }
       }
   }
